@@ -1,10 +1,8 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography;
 using HoloToolkit.Unity.InputModule;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour, IInputClickHandler
+public class Enemy : MonoBehaviour, IInputClickHandler, IFocusable
 {
     public GameObject deathParticles;
     public GameObject gunPoint;
@@ -12,10 +10,15 @@ public class Enemy : MonoBehaviour, IInputClickHandler
     public GameObject playerObject;
     private float timer;
     public float shootDelay = 3f;
+    private Renderer renderer;
+    private Color defaultColor;
+    public static int killCount;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         playerObject = GameObject.Find("MixedRealityCamera");
+        renderer = GetComponent<Renderer>();
+        defaultColor = Color.white;
     }
 
 	void Update () {
@@ -36,16 +39,31 @@ public class Enemy : MonoBehaviour, IInputClickHandler
         timer += Time.deltaTime;
         if (shootDelay < timer)
         {
-            //Debug.Log("shoot");
-            Instantiate(bullet, gunPoint.transform.position, Quaternion.identity);
+            Instantiate(bullet, gunPoint.transform.position, Quaternion.identity);          
             timer = 0;
         }
-        
     }
 
     public void OnInputClicked(InputClickedEventData eventData)
+    { 
+        StartCoroutine(destroyObject());
+    }
+
+    IEnumerator destroyObject()
     {
+        killCount++;
         Destroy(gameObject);
-        Destroy(Instantiate(deathParticles,transform.position, Quaternion.identity), 1f);
+        Destroy(Instantiate(deathParticles, transform.position, Quaternion.identity), 1f);
+        yield break;
+    }
+
+    public void OnFocusEnter()
+    {
+        renderer.material.color = Color.red;
+    }
+
+    public void OnFocusExit()
+    {
+        renderer.material.color = defaultColor;
     }
 }

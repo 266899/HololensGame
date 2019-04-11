@@ -28,10 +28,8 @@ public class EnemySpawner : MonoBehaviour {
         int count = objects.transform.childCount;
         int randomObject = Random.Range(0, count);
         GameObject enemy = Instantiate(enemyPrefab);
-        //Debug.Log(objects.transform.GetChild(randomObject).ToString());
         Vector3[] array = objects.transform.GetChild(randomObject).GetComponent<MeshFilter>().mesh.vertices;
         int randomPos = Random.Range(0, array.Length);
-        
         enemy.transform.position = array[randomPos];
     }
 }

@@ -1,17 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
     
     public GameObject cursor;
     private float shootingDistance = 100f;
-
+    public Image healthBar;
     public static bool alive = true;
     public static float health = 100f;
-    
-	void Update ()
+    public Text killCount;
+    public GameObject pauseMenu;
+   
+
+    void Update ()
     {   
         RaycastHit hit;
         Ray forwardRay = new Ray(transform.position, Vector3.forward);
@@ -28,15 +33,26 @@ public class Player : MonoBehaviour
             }
         }
 
-        CheckAlive();
-	}
+        killCount.text = Enemy.killCount.ToString();
+    }
 
-    public void CheckAlive()
+    public void TakeDamage(float amount)
     {
+        health -= amount;
+        healthBar.fillAmount = health / 100f;
+
         if (health <= 0)
         {
-            gameObject.SetActive(false);
+            Time.timeScale = 0f;
+            pauseMenu.SetActive(true);
         }
+    }
+
+    public void Reset()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Time.timeScale = 1f;
+        pauseMenu.SetActive(false);
     }
 
 }
